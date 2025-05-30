@@ -331,11 +331,11 @@ const scenarios = [
   },
   {
     name: 'Understaffed Shift',
-    ...runMonteCarlo(10000, 5, 15, 60),
+    ...runMonteCarlo(1000, 5, 15, 60),
   },
   {
     name: 'Faster Counselling',
-    ...runMonteCarlo(10000, 10, 15, 45),
+    ...runMonteCarlo(1000, 10, 15, 45),
   },
 ];
 
