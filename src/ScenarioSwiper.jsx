@@ -315,7 +315,7 @@ function statDelta(current, baseline) {
 const scenarios = [
   {
     name: 'Baseline',
-    ...runMonteCarlo(1000, 5, 15, 60),
+    ...runMonteCarlo(1000, 10, 15, 60),
   },
   {
     name: 'Increased Staff',
@@ -323,19 +323,19 @@ const scenarios = [
   },
   {
     name: 'Reduced Intake',
-    ...runMonteCarlo(1000, 5, 10, 60),
+    ...runMonteCarlo(1000, 10, 10, 60),
   },
   {
     name: 'High Demand',
-    ...runMonteCarlo(1000, 5, 25, 60),
+    ...runMonteCarlo(1000, 10, 25, 60),
   },
   {
     name: 'Understaffed Shift',
-    ...runMonteCarlo(1000, 3, 15, 60),
+    ...runMonteCarlo(10000, 5, 15, 60),
   },
   {
     name: 'Faster Counselling',
-    ...runMonteCarlo(1000, 5, 15, 45),
+    ...runMonteCarlo(10000, 10, 15, 45),
   },
 ];
 
