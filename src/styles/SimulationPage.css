@@ -243,16 +243,25 @@ body {
   margin: 0;
 }
 
-/* 👇 MODIFIED this rule */
+/* Style for list items */
 .sidebar-content li {
   color: #475569;
   line-height: 1.6;
-  padding-bottom: 1.25rem; /* Add space below the text */
-  margin-bottom: 1.25rem; /* Add space below the divider */
+  padding-bottom: 1.25rem; /* Space below the text */
+  margin-bottom: 1.25rem;  /* Space below the divider */
+  position: relative;      /* Needed for ::after positioning */
 }
 
-.sidebar-content li:not(:last-child) {
-  border-bottom: 1px solid rgba(52, 81, 94, 0.2); /* 0.2 = 20% opacity */
+/* Transparent divider using ::after */
+.sidebar-content li:not(:last-child)::after {
+  content: '';
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: rgba(52, 81, 94, 0.08); /* More transparent */
 }
 
 
