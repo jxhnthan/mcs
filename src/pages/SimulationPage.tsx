@@ -68,25 +68,24 @@ const runMonteCarloSimulation = ({ dailyInquiries, dailyCapacity }: { dailyInqui
 const scenarios = {
   baseline: {
     label: "Current State",
-    // This function creates a data-driven insight
-    getInsight: (insights: { growthProbability: number }) => 
-      `With current capacity, there's a ${insights.growthProbability}% chance the waitlist will be larger in 90 days, indicating an unsustainable model.`,
+    getInsight: (insights: { growthProbability: number }) =>
+      `Under current capacity levels, there is a ${insights.growthProbability}% probability that the waitlist will grow over the next 90 days. This suggests current resources may be insufficient to meet demand.`,
     color: "rgba(255, 159, 64, 0.5)",
     borderColor: "rgba(255, 159, 64, 1)",
     params: { dailyInquiries: 2.8, dailyCapacity: 2.0 },
   },
   hireTherapist: {
     label: "Hire 1 New Therapist",
-    getInsight: (insights: { growthProbability: number }) => 
-      `By adding one therapist, the probability of waitlist growth drops to just ${insights.growthProbability}%, creating a more resilient and predictable service.`,
+    getInsight: (insights: { growthProbability: number }) =>
+      `With the addition of one therapist, the likelihood of the waitlist growing within 90 days reduces to ${insights.growthProbability}%. This indicates improved alignment between capacity and anticipated demand.`,
     color: "rgba(75, 192, 192, 0.5)",
     borderColor: "rgba(75, 192, 192, 1)",
     params: { dailyInquiries: 2.8, dailyCapacity: 3.0 },
   },
   crisis: {
     label: "Crisis Hits",
-    getInsight: (insights: { growthProbability: number }) => 
-      `A demand surge creates a near-certainty (${insights.growthProbability}%) of overwhelming the waitlist, highlighting a critical need for a crisis response plan.`,
+    getInsight: (insights: { growthProbability: number }) =>
+      `In this high-demand scenario, there is a ${insights.growthProbability}% chance the waitlist will increase, highlighting potential service strain during a crisis or seasonal surge.`,
     color: "rgba(255, 99, 132, 0.5)",
     borderColor: "rgba(255, 99, 132, 1)",
     params: { dailyInquiries: 4.5, dailyCapacity: 2.0 },
