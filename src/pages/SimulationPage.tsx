@@ -179,7 +179,7 @@ const AssumptionsSidebar: React.FC<AssumptionsSidebarProps> = ({ isOpen, onClose
               Peak Seasonality: A predictable "peak season" is modelled between days 60 and 75, causing a 50% increase in daily client enquiries.
             </li>
             <li>
-              Random Shocks: The model includes a 5% daily probability of an unexpected staff leave, which reduces service capacity to zero for that day.
+              Random Shocks: The model includes a 5% daily probability of an unexpected staff absence, which reduces service capacity to zero for that day.
             </li>
           </ul>
         </div>
