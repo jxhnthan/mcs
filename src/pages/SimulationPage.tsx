@@ -108,7 +108,7 @@ const scenarios = {
   hireTherapist: {
     label: "Hire 1 New Therapist",
     getInsight: (i: ReturnType<typeof calculateInsights>) =>
-      `By adding one therapist, the probability of waitlist growth drops to just ${i.growthProbability}%, creating a more resilient and predictable service.`,
+      `By adding one therapist, the probability of waitlist growth drops to just ${i.growthProbability}%, possibly creating a more resilient service.`,
     color: "rgba(75, 192, 192, 0.5)",
     borderColor: "rgba(75, 192, 192, 1)",
     params: { dailyInquiries: 2.8, dailyCapacity: 3.0 },
