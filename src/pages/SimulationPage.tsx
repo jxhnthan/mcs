@@ -12,39 +12,42 @@ import {
 import annotationPlugin from 'chartjs-plugin-annotation';
 import '../styles/SimulationPage.css';
 
-// Register the required Chart.js components and plugins
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Filler, annotationPlugin);
 
-// The Monte Carlo Simulation Engine
+// --- 1. NEW: Helper function to calculate insightful KPIs ---
+const calculateInsights = (results: number[], initialSize: number) => {
+  // Calculate the percentage of simulation runs where the waitlist grew
+  const grewCount = results.filter(finalSize => finalSize > initialSize).length;
+  const growthProbability = Math.round((grewCount / results.length) * 100);
+  return { growthProbability };
+};
+
 const runMonteCarloSimulation = ({ dailyInquiries, dailyCapacity }: { dailyInquiries: number; dailyCapacity: number }) => {
-  const NUM_SIMULATIONS = 5000; // Number of "what-if" futures to run
-  const SIMULATION_PERIOD_DAYS = 90; // Simulate over 3 months
+  const NUM_SIMULATIONS = 5000;
+  const SIMULATION_PERIOD_DAYS = 90;
   const INITIAL_WAITLIST_SIZE = 50;
 
   const finalWaitlistResults: number[] = [];
 
-  // Run the simulation thousands of times
   for (let i = 0; i < NUM_SIMULATIONS; i++) {
     let currentWaitlist = INITIAL_WAITLIST_SIZE;
-    // Simulate day-by-day for the period
     for (let day = 0; day < SIMULATION_PERIOD_DAYS; day++) {
-      // Introduce randomness for daily fluctuations
       const newPatients = Math.max(0, dailyInquiries + (Math.random() - 0.5) * dailyInquiries);
       const seenPatients = Math.max(0, dailyCapacity + (Math.random() - 0.5) * dailyCapacity);
-
       currentWaitlist += newPatients - seenPatients;
     }
-    finalWaitlistResults.push(Math.max(0, currentWaitlist)); // Store the result of this one simulation
+    finalWaitlistResults.push(Math.max(0, currentWaitlist));
   }
 
-  // Process the thousands of results to find key metrics
   finalWaitlistResults.sort((a, b) => a - b);
 
-  const peakTime = Math.round(finalWaitlistResults[Math.floor(NUM_SIMULATIONS / 2)]); // Median result
-  const ciLower = Math.round(finalWaitlistResults[Math.floor(NUM_SIMULATIONS * 0.025)]); // 2.5th percentile
-  const ciUpper = Math.round(finalWaitlistResults[Math.floor(NUM_SIMULATIONS * 0.975)]); // 97.5th percentile
+  const peakTime = Math.round(finalWaitlistResults[Math.floor(NUM_SIMULATIONS / 2)]);
+  const ciLower = Math.round(finalWaitlistResults[Math.floor(NUM_SIMULATIONS * 0.025)]);
+  const ciUpper = Math.round(finalWaitlistResults[Math.floor(NUM_SIMULATIONS * 0.975)]);
+  
+  // Calculate insights from the raw results
+  const insights = calculateInsights(finalWaitlistResults, INITIAL_WAITLIST_SIZE);
 
-  // Group results into bins to create the distribution chart data
   const binSize = 2;
   const bins: { [key: number]: number } = {};
   finalWaitlistResults.forEach(result => {
@@ -56,29 +59,34 @@ const runMonteCarloSimulation = ({ dailyInquiries, dailyCapacity }: { dailyInqui
     x: Number(key),
     y: bins[Number(key)],
   }));
-
-  return { data: chartData, peakTime, ciLower, ciUpper };
+  
+  // Return the calculated insights along with other data
+  return { data: chartData, peakTime, ciLower, ciUpper, insights };
 };
 
-// Scenarios now hold INPUTS for the simulation engine
+// --- 2. UPDATED: Scenarios now have functions to generate dynamic insights ---
 const scenarios = {
   baseline: {
     label: "Current State",
-    insight: "Currently, wait times are unpredictable, averaging 4 weeks.",
+    // This function creates a data-driven insight
+    getInsight: (insights: { growthProbability: number }) => 
+      `With current capacity, there's a ${insights.growthProbability}% chance the waitlist will be larger in 90 days, indicating an unsustainable model.`,
     color: "rgba(255, 159, 64, 0.5)",
     borderColor: "rgba(255, 159, 64, 1)",
     params: { dailyInquiries: 2.8, dailyCapacity: 2.0 },
   },
   hireTherapist: {
     label: "Hire 1 New Therapist",
-    insight: "Adding staff reduces the average wait time and makes our service more predictable.",
+    getInsight: (insights: { growthProbability: number }) => 
+      `By adding one therapist, the probability of waitlist growth drops to just ${insights.growthProbability}%, creating a more resilient and predictable service.`,
     color: "rgba(75, 192, 192, 0.5)",
     borderColor: "rgba(75, 192, 192, 1)",
     params: { dailyInquiries: 2.8, dailyCapacity: 3.0 },
   },
   crisis: {
     label: "Crisis Hits",
-    insight: "A sudden demand surge could overwhelm our system, leading to long delays.",
+    getInsight: (insights: { growthProbability: number }) => 
+      `A demand surge creates a near-certainty (${insights.growthProbability}%) of overwhelming the waitlist, highlighting a critical need for a crisis response plan.`,
     color: "rgba(255, 99, 132, 0.5)",
     borderColor: "rgba(255, 99, 132, 1)",
     params: { dailyInquiries: 4.5, dailyCapacity: 2.0 },
@@ -87,16 +95,16 @@ const scenarios = {
 
 type ScenarioKey = keyof typeof scenarios;
 
-// The React Component
 const SimulationPage: React.FC = () => {
   const [activeScenario, setActiveScenario] = useState<ScenarioKey>('baseline');
   const currentScenarioDetails = scenarios[activeScenario];
 
-  // useMemo hook prevents re-running the expensive simulation on every render
   const simulationResults = useMemo(() => {
     return runMonteCarloSimulation(currentScenarioDetails.params);
-    // FIXED: Added the missing dependency to the array
   }, [activeScenario, currentScenarioDetails.params]);
+
+  // --- 3. UPDATED: Generate the insight text dynamically ---
+  const insightText = currentScenarioDetails.getInsight(simulationResults.insights);
 
   const chartData = {
     datasets: [
@@ -144,7 +152,6 @@ const SimulationPage: React.FC = () => {
         },
         ticks: { color: '#64748b' },
         min: 0,
-        // The axis max is dynamic to prevent the graph from going off-screen
         max: Math.ceil((simulationResults.ciUpper + 10) / 10) * 10,
       },
       y: { display: false },
@@ -166,8 +173,9 @@ const SimulationPage: React.FC = () => {
           <span className="ci-label">95% Confidence Interval</span>
         </div>
       </div>
-
-      <p className="insight-text">{currentScenarioDetails.insight}</p>
+      
+      {/* Use the dynamic insight text here */}
+      <p className="insight-text">{insightText}</p>
 
       <div className="scenario-buttons">
         {Object.keys(scenarios).map((key) => (
