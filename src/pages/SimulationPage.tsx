@@ -170,13 +170,13 @@ const AssumptionsSidebar: React.FC<AssumptionsSidebarProps> = ({ isOpen, onClose
               Initial State: The simulation starts with a baseline waitlist of 50 people.
             </li>
             <li>
-              Demand Model: New patient inquiries follow a Normal (Gaussian) distribution, with the standard deviation set to 20% of the mean to model realistic daily fluctuations.
+              Demand Model: New client enquiries follow a Normal (Gaussian) distribution, with the standard deviation set to 20% of the mean to model realistic daily fluctuations.
             </li>
             <li>
               Capacity Model: The number of clients seen daily also follows a Normal distribution, with a smaller standard deviation (10% of the mean) to reflect a more controlled process.
             </li>
             <li>
-              Peak Seasonality: A predictable "peak season" is modeled between days 60 and 75, causing a 50% increase in daily clients inquiries.
+              Peak Seasonality: A predictable "peak season" is modeled between days 60 and 75, causing a 50% increase in daily clients enquiries.
             </li>
             <li>
               Random Shocks: The model includes a 5% daily probability of an unexpected staff leave, which reduces service capacity to zero for that day.
