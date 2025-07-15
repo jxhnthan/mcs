@@ -251,9 +251,8 @@ body {
   margin-bottom: 1.25rem; /* Add space below the divider */
 }
 
-/* 👇 ADDED this rule for the divider */
 .sidebar-content li:not(:last-child) {
-  border-bottom: 1px solid #34515e; /* A very light divider color */
+  border-bottom: 1px solid rgba(52, 81, 94, 0.2); /* 0.2 = 20% opacity */
 }
 
 
